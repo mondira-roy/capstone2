@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: MondiraSimonCapstone
+  description: Level-Up Service
+  version: 0.0.1
+servers: 
+  - url: http://localhost:7001
+    description: Level Up web service
+paths: 
+  /levelup:
+    post:
+      summary: Creates a new Level Up entry with the given information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LevelUp'
+      responses:
+        '201':
+          description: A Level Up object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelUp'
+        '400':
+          description: Invalid request syntax.
+        '422':
+          description: Incomplete LevelUp information. Some required fields missing.
+    
+    get:
+      summary: get All LevelUp Details
+      responses:
+        '200':
+          description: Generate a Level Up list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/LevelUp'
+                  
+  /levelup/{id}:            
+    get:
+      summary: get LevelUp by id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the levelUp
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a levelUp list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/LevelUp'
+   
+  
+    put:
+      summary: Updated the entry for the Level with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Level Up you would like to update.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LevelUp'
+      responses:
+        '200':
+          description: LevelUp successfully updated.
+        '422':
+          description: Level Up ID on path must match the ID in the LevelUp object.
+    
+    delete:
+      summary: Deletes the entry for the Level up with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Post you would like to delete.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Task successfully deleted.
+  /levelup/{customerId}:            
+    get:
+      summary: get LevelUp by levelUpId
+      parameters: 
+        - name: customerId
+          in: path
+          required: true
+          description: id of the customer
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a levelUp list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/LevelUp'
+   
+  
+ 
+    
+components:
+  schemas:
+  
+    LevelUp:
+      type: object
+      properties:
+        level_up_id:
+          type: number
+        customer_id:
+          type: number
+        points:
+          type: number
+        member_date:
+          type: string
+    
+          
+    
