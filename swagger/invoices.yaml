@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  title: MondiraSimonCapstone
-  description: Invoice Service
+  title: Invoice Service
+  description: MondiraSimonCapstone
   version: 0.0.1
 servers: 
   - url: http://localhost:7002
     description: Invoice web service
 paths: 
-  /invoice:
+  /invoices:
     post:
       summary: Creates a new Invoice entry with the given information
       requestBody:
@@ -40,7 +40,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Invoice'
                   
-  /invoice/{id}:            
+  /invoices/{id}:            
     get:
       summary: get Invoice by id
       parameters: 
@@ -61,7 +61,8 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/Invoice'
-   
+        '400':
+          description: Entity not found
   
     put:
       summary: Updated the entry for the Invoice with the given ID.
@@ -85,7 +86,9 @@ paths:
           description: Invoice successfully updated.
         '422':
           description: Invoice ID on path must match the ID in the Invoice object.
-    
+        '400':
+          description: Entity not found 
+          
     delete:
       summary: Deletes the entry for the Invoice up with the given ID.
       parameters: 
@@ -99,8 +102,11 @@ paths:
             minimum: 1
       responses:
         '200':
-          description: Invoice successfully deleted.
-  /invoice/{customerId}:            
+          description: Invoice successfully deleted
+        '400':
+          description: Entity not found
+          
+  /invoices/{customerId}:            
     get:
       summary: get Invoice by customer ID
       parameters: 
@@ -121,22 +127,22 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/Invoice'
-   
+        '400':
+          description: Entity not found   
   
  
     
 components:
   schemas:
-  
     Invoice:
       type: object
       properties:
-        invoice_id:
+        invoiceId:
           type: number
-        customer_id:
+        customerId:
           type: number
-        purchase_date:
-          type: string
+        purchaseDate:
+          type: object # Date
     
           
     

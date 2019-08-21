@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  title: Product Service
+  description:  Mondira-Simon Capstone Project
+  version: 0.0.1
+servers: 
+  - url: http://localhost:7003
+    description: Product web service
+paths: 
+  /products:
+    post:
+      summary: Creates a new Product entry with the given information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: A Product object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid request syntax.
+        '422':
+          description: Incomplete LevelUp information. Some required fields missing.
+    
+    get:
+      summary: get All Product Details
+      responses:
+        '200':
+          description: Generate a Product list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Product'
+                  
+  /products/{id}:            
+    get:
+      summary: get Product by id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Product
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Product list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: Entity not Found 
+  
+    put:
+      summary: Updated the entry for the Product with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Product you would like to update.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Product successfully updated.
+        '422':
+          description: Product ID on path must match the ID in the Product object.
+        '404':
+          description: Entity not Found
+          
+    delete:
+      summary: Deletes the entry for the Product with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Product you would like to delete.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Invoice successfully deleted.
+        '404':
+          description: Entity not Found 
+          
+  /products/invoice/{invoiceId}:            
+    get:
+      summary: get Product by Invoice ID
+      parameters: 
+        - name: invoiceId
+          in: path
+          required: true
+          description: Get product by id of the invoice
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a Invoice list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: Entity not Found 
+          
+  /products/inventory:            
+    get:
+      summary: get Products in Inventory
+      parameters: 
+        - name: inventory
+          in: path
+          required: true
+          description: Get product List in inventory
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a Product list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Product' 
+        '404':
+          description: Entity not Found 
+  
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        productId:
+          type: number
+        productName:
+          type: string
+        productDescription:
+          type: string
+        listPrice:
+          type: number
+        unitCost:
+          type: number
+    
+          
+    

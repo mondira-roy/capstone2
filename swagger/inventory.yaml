@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: Inventory Service
+  description: MondiraSimonCapstone
+  version: 0.0.1
+servers: 
+  - url: http://localhost:7003
+    description: Inventory web service
+paths: 
+  /inventory:
+    post:
+      summary: Creates a new Inventory entry with the given information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inventory'
+      responses:
+        '201':
+          description: An Inventory object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+        '400':
+          description: Invalid request syntax.
+        '422':
+          description: Incomplete LevelUp information. Some required fields missing.
+    
+    get:
+      summary: get All Inventory Details
+      responses:
+        '200':
+          description: Generate an Inventory list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Inventory'
+                  
+  /Inventory/{id}:            
+    get:
+      summary: get Inventory by id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Inventory
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Inventory list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Inventory'
+        '404':
+          description: Entity not found
+   
+  
+    put:
+      summary: Updated the entry for the Inventory with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Inventory you would like to update.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inventory'
+      responses:
+        '200':
+          description: Inventorye successfully updated.
+        '422':
+          description: Inventory ID on path must match the ID in the Inventory object.
+        '404':
+          description: Entity not found  
+          
+    delete:
+      summary: Deletes the entry for the Inventory with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Inventory you would like to delete.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Inventory successfully deleted.
+        '404':
+          description: Entity not found
+    
+components:
+  schemas:
+    Inventory:
+      type: object
+      properties:
+        inventoryId:
+          type: number
+        productId:
+          type: number
+        quantity:
+          type: number
