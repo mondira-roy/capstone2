@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RefreshScope
-@RequestMapping("levelup")
+@RequestMapping("/levelup")
 public class LevelupController {
 
     @Autowired
@@ -61,5 +61,10 @@ public class LevelupController {
         service.deleteLevelup(id);
     }
 
+    @GetMapping("/customer/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Levelup getLevelupByCustomerId(@PathVariable int id) {
+        return service.getLevelUpByCustomerId(id);
+    }
 
 }

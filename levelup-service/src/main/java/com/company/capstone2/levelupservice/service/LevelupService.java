@@ -4,6 +4,7 @@ import com.company.capstone2.levelupservice.dao.LevelupDao;
 import com.company.capstone2.levelupservice.model.Levelup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class LevelupService {
         this.dao = dao;
     }
 
+    @Transactional
     public Levelup addLevelup(Levelup levelup) {
         levelup = dao.addLevelup(levelup);
         return levelup;

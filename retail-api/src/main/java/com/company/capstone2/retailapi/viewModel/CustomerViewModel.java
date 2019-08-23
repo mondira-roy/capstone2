@@ -1,8 +1,5 @@
 package com.company.capstone2.retailapi.viewModel;
 
-import com.company.capstone2.retailapi.model.Levelup;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +17,7 @@ public class CustomerViewModel {
     private String email;
     private String phone;
     // A customer has many invoices
-    private List<InvoiceViewModel> invoices;
+    private List<RetailInvoiceViewModel> invoices;
 
     @Override
     public boolean equals(Object o) {
@@ -107,11 +104,11 @@ public class CustomerViewModel {
         this.phone = phone;
     }
 
-    public List<InvoiceViewModel> getInvoices() {
+    public List<RetailInvoiceViewModel> getInvoices() {
         return invoices;
     }
 
-    public void setInvoices(List<InvoiceViewModel> invoices) {
+    public void setInvoices(List<RetailInvoiceViewModel> invoices) {
         this.invoices = invoices;
     }
 }
