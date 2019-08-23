@@ -1,19 +1,16 @@
 package com.company.capstone2.retailapi.Service;
 
-import com.company.capstone2.retailapi.model.Invoice;
-import com.company.capstone2.retailapi.model.InvoiceItem;
-import com.company.capstone2.retailapi.model.Levelup;
-import com.company.capstone2.retailapi.model.Product;
-import com.company.capstone2.retailapi.util.feign.InvoiceClient;
-import com.company.capstone2.retailapi.util.feign.LevelupClient;
-import com.company.capstone2.retailapi.util.feign.ProductClient;
-import com.company.capstone2.retailapi.viewModel.InvoiceViewModel;
+import com.company.capstone2.retailapi.exception.NotFoundException;
+import com.company.capstone2.retailapi.model.*;
+import com.company.capstone2.retailapi.util.feign.*;
+import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,9 +18,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,6 +34,12 @@ public class RetailApiServiceTest {
     LevelupClient levelupClient;
     @Mock
     ProductClient productClient;
+    @Mock
+    CustomerClient customerClient;
+    @Mock
+    InventoryClient inventoryClient;
+    @Mock
+    RabbitTemplate rabbit;
     @InjectMocks
     RetailApiService service;
 
@@ -43,66 +48,86 @@ public class RetailApiServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
+    public static final String EXCHANGE = "level-up-exchange";
+    public static final String ROUTING_KEY = "level-up.#";
+
     //    public InvoiceViewModel submitInvoice(InvoiceViewModel ivm)
     @Test
     public void testSubmitInvoice() {
+        // arrange input
+        // retailInvoiceViewModel{
+        // customerId:10,
+        // invoiceItem:[{inventoryId:1000, quantity:1 },{inventoryId:1001, quantity:10}],
+        // awardPoints:40
+        // }
 
-        Invoice invoice1 = new Invoice();
-        invoice1.setInvoiceId(1);
-        invoice1.setCustomerId(10);
-        invoice1.setPurchaseDate(LocalDate.of(2000, 1, 1));
-
-        InvoiceItem invoiceItem1 = new InvoiceItem();
-        invoiceItem1.setInvoiceItemId(100);
-        invoiceItem1.setInvoiceId(1);
-        invoiceItem1.setInventoryId(1000);
-        invoiceItem1.setQuantity(1);
-        invoiceItem1.setUnitPrice(new BigDecimal(100.00).setScale(2));
-
-        InvoiceItem invoiceItem2 = new InvoiceItem();
-        invoiceItem2.setInvoiceItemId(101);
-        invoiceItem2.setInvoiceId(1);
-        invoiceItem2.setInventoryId(1001);
-        invoiceItem2.setQuantity(10);
-        invoiceItem2.setUnitPrice(new BigDecimal(10.00).setScale(2));
-
+        RetailInvoiceViewModel rivm = new RetailInvoiceViewModel();
+        rivm.setCustomerId(1);
+        rivm.setPurchaseDate(LocalDate.now());
+        InvoiceItem invoiceItem1a = new InvoiceItem();
+        invoiceItem1a.setInventoryId(1000);
+        invoiceItem1a.setQuantity(1);
+        invoiceItem1a.setUnitPrice(new BigDecimal(100.00).setScale(2));
+        InvoiceItem invoiceItem1b = new InvoiceItem();
+        invoiceItem1b.setInventoryId(1001);
+        invoiceItem1b.setQuantity(10);
+        invoiceItem1b.setUnitPrice(new BigDecimal(10.00).setScale(2));
         List<InvoiceItem> invoiceItems = new ArrayList<>();
-        invoiceItems.add(invoiceItem1);
-        invoiceItems.add(invoiceItem2);
+        invoiceItems.add(invoiceItem1a);
+        invoiceItems.add(invoiceItem1b);
+        rivm.setInvoiceItems(invoiceItems);
 
-        // construct expected ivm
-        InvoiceViewModel ivm1 = new InvoiceViewModel();
-        ivm1.setInvoiceId(invoice1.getInvoiceId());
-        ivm1.setCustomerId(invoice1.getCustomerId());
-        ivm1.setPurchaseDate(invoice1.getPurchaseDate());
-        ivm1.setPoint(40);
-        ivm1.setInvoiceItems(invoiceItems);
+        RetailInvoiceViewModel rivm2 = new RetailInvoiceViewModel();
+        rivm2.setInvoiceId(1);
+        rivm2.setCustomerId(1);
+        rivm2.setPurchaseDate(LocalDate.now());
+        InvoiceItem invoiceItem2a = new InvoiceItem();
+        invoiceItem2a.setInvoiceItemId(1);
+        invoiceItem2a.setInventoryId(1000);
+        invoiceItem2a.setQuantity(1);
+        invoiceItem2a.setUnitPrice(new BigDecimal(100.00).setScale(2));
+        InvoiceItem invoiceItem2b = new InvoiceItem();
+        invoiceItem2a.setInvoiceItemId(2);
+        invoiceItem2b.setInventoryId(1001);
+        invoiceItem2b.setQuantity(10);
+        invoiceItem2b.setUnitPrice(new BigDecimal(10.00).setScale(2));
+        List<InvoiceItem> invoiceItems2 = new ArrayList<>();
+        invoiceItems2.add(invoiceItem2a);
+        invoiceItems2.add(invoiceItem2b);
+        rivm2.setInvoiceItems(invoiceItems2);
 
-        // construct input ivm
-        InvoiceViewModel ivm = new InvoiceViewModel();
-        ivm.setInvoiceId(invoice1.getInvoiceId());
-        ivm.setCustomerId(invoice1.getCustomerId());
-        ivm.setPurchaseDate(invoice1.getPurchaseDate());
-        ivm.setInvoiceItems(invoiceItems);
+        Customer customer1 = new Customer();
+        customer1.setCustomerId(1);
+        when(customerClient.getCustomerById(1)).thenReturn(customer1);
+        Inventory inventory1a = new Inventory();
+        inventory1a.setProductId(50);
+        Inventory inventory1b = new Inventory();
+        inventory1b.setProductId(51);
+        when(inventoryClient.getInventoryById(1000)).thenReturn(inventory1a);
+        when(inventoryClient.getInventoryById(1001)).thenReturn(inventory1b);
+        Product product1a = new Product();
+        product1a.setListPrice(new BigDecimal(100.0).setScale(2));
+        Product product1b = new Product();
+        product1b.setListPrice(new BigDecimal(10.0).setScale(2));
+        when(productClient.getProductById(50)).thenReturn(product1a);
+        when(productClient.getProductById(51)).thenReturn(product1b);
+        when(invoiceClient.submitInvoice(rivm)).thenReturn(rivm2);
+        rivm = service.submitInvoice(rivm);
 
-        // mock performance arrangement
-        when(invoiceClient.submitInvoice(ivm)).thenReturn(ivm);
-        // test
-        // after passing it to service, ivm should have:
-        // invoiceId;                      # generated when going though invoice dao
-        // customerId;                     # comes with input
-        // purchaseDate;                   # comes with input
-        // List<InvoiceItem> invoiceItems; # comes with input but without invoiceItemId, generated after dao
-        // point;                          # calculated using the total of price in invoiceItem
-        ivm = service.submitInvoice(ivm);
-        assertEquals(ivm, ivm1);
+        verify(customerClient, times(1)).getCustomerById(1);
+        verify(inventoryClient, times(2)).getInventoryById(any(Integer.class));
+        verify(productClient, times(2)).getProductById(any(Integer.class));
+        verify(levelupClient, times(1)).getLevelUpPointsByCustomerId(1);
+        verify(rabbit, times(1)).convertAndSend(eq(EXCHANGE),
+                eq(ROUTING_KEY), any(Object.class));
+        assertEquals(rivm.getPoint(),40);
     }
 
     //    public InvoiceViewModel getInvoiceById(int id)
     @Test
     public void testGetInvoiceById() {
         // act
-        InvoiceViewModel ivm = service.getInvoiceById(5);
+        RetailInvoiceViewModel ivm = service.getInvoiceById(5);
         // assert
         verify(invoiceClient, times(1)).getInvoiceById(5);
     }
@@ -111,7 +136,7 @@ public class RetailApiServiceTest {
     @Test
     public void testGetAllInvoices() {
         // act
-        List<InvoiceViewModel> ivms = service.getAllInvoices();
+        List<RetailInvoiceViewModel> ivms = service.getAllInvoices();
         // assert
         verify(invoiceClient, times(1)).getAllInvoices();
     }
@@ -120,7 +145,7 @@ public class RetailApiServiceTest {
     @Test
     public void testGetInvoiceByCustomerId() {
         // act
-        List<InvoiceViewModel> ivms = service.getInvoicesByCustomerId(5);
+        List<RetailInvoiceViewModel> ivms = service.getInvoicesByCustomerId(5);
         // assert
         verify(invoiceClient, times(1)).getInvoicesByCustomerId(5);
     }
@@ -147,6 +172,7 @@ public class RetailApiServiceTest {
         List<Product> products = service.getProductByInvoiceId(5);
         verify(productClient, times(1)).getProductByInvoiceId(5);
     }
+
     //    public int getLevelUpPointsByCustomerId(int id)
     @Test
     public void testGetLevelUpPointsByCustomerId() {

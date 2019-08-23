@@ -1,9 +1,8 @@
 package com.company.capstone2.retailapi.controller;
 
 import com.company.capstone2.retailapi.Service.RetailApiService;
-import com.company.capstone2.retailapi.model.Invoice;
 import com.company.capstone2.retailapi.model.Product;
-import com.company.capstone2.retailapi.viewModel.InvoiceViewModel;
+import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
@@ -22,22 +21,22 @@ public class RetailApiController {
     }
 
     @RequestMapping(value = "/invoices", method = RequestMethod.POST)
-    public InvoiceViewModel submitInvoice(@RequestBody InvoiceViewModel ivm) {
+    public RetailInvoiceViewModel submitInvoice(@RequestBody RetailInvoiceViewModel ivm) {
         return service.submitInvoice(ivm);
     }
 
     @RequestMapping(value = "/invoices/{id}", method = RequestMethod.GET)
-    public InvoiceViewModel getInvoiceById(@PathVariable int id) {
+    public RetailInvoiceViewModel getInvoiceById(@PathVariable int id) {
         return service.getInvoiceById(id);
     }
 
     @RequestMapping(value = "/invoices", method = RequestMethod.GET)
-    public List<InvoiceViewModel> getAllInvoices() {
+    public List<RetailInvoiceViewModel> getAllInvoices() {
         return service.getAllInvoices();
     }
 
     @RequestMapping(value = "/invoices/customer/{id}", method = RequestMethod.GET)
-    public List<InvoiceViewModel> getInvoicesByCustomerId(@PathVariable int id) {
+    public List<RetailInvoiceViewModel> getInvoicesByCustomerId(@PathVariable int id) {
         return service.getInvoicesByCustomerId(id);
     }
 
