@@ -100,16 +100,13 @@ public class LevelupDaoJdbcTemplateImple implements LevelupDao {
     }
 
     @Override
-    public Levelup getLevelupByCustomerId(int id) {
+    public List<Levelup> getLevelupByCustomerId(int id) {
         String sql = "select * from level_up where customer_id=?";
-        try {
-            return jdbcTemplate.queryForObject(
+
+            return jdbcTemplate.query(
                     sql,
                     this::mapTo,
-                    id
-            );
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+                    id);
+
     }
 }

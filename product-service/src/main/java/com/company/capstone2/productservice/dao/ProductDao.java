@@ -15,17 +15,9 @@ public interface ProductDao {
     //method to add  a new Product to inventory
     Product addProduct(Product product);
 
-  //Additional Methods
-    List<Product> getProductsInInventory();
-
-    Product
-
     //Update Product
     void updateProduct(Product product);
 
-    /**
-     * Delete  a Product
-     */
     void deleteProduct(int id);
 
 }

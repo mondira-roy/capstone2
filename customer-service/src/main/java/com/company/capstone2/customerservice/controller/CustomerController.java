@@ -35,7 +35,7 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public Customer getCustomerById(@PathVariable int id) {
+    public Customer getCustomerById(@PathVariable int id)throws NotFoundException {
         Customer  customer= service.getCustomerById(id);
         if (customer==null){
             throw new NotFoundException("Customer not found, id: "+id);

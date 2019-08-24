@@ -10,13 +10,8 @@ import java.util.List;
 
 @FeignClient(name="product-service")
 public interface ProductClient {
-    @RequestMapping(value = "/products/inventory", method = RequestMethod.GET)
-    public List<Product> getProductsInInventory();
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     public Product getProductById(@PathVariable int id);
-
-    @RequestMapping(value = "/products/invoice/{id}", method = RequestMethod.GET)
-    public List<Product> getProductByInvoiceId(@PathVariable int id);
 
 }

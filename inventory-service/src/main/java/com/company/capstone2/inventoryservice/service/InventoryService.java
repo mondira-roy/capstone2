@@ -2,6 +2,7 @@ package com.company.capstone2.inventoryservice.service;
 
 import com.company.capstone2.inventoryservice.dao.InventoryDao;
 import com.company.capstone2.inventoryservice.model.Inventory;
+import com.company.capstone2.inventoryservice.util.feign.InvoiceServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +12,12 @@ import java.util.List;
 public class InventoryService {
     @Autowired
     InventoryDao dao;
+    @Autowired
+    InvoiceServiceClient invoiceClient;
 
-    public InventoryService(InventoryDao dao) {
+    public InventoryService(InventoryDao dao,InvoiceServiceClient invoiceClient) {
         this.dao = dao;
+        this.invoiceClient = invoiceClient;
     }
 
     public Inventory addInventory(Inventory inventory) {
@@ -30,12 +34,16 @@ public class InventoryService {
     }
 
     public void updateInventory(Inventory inventory) {
-
         dao.updateInventory(inventory);
     }
 
     public void deleteInventory(int id) {
+        invoiceClient.deleteInvoiceItemByInventoryId(id);
         dao.deleteInventory(id);
+    }
+
+    public void deleteInventoryByProductId(int id) {
+        dao.deleteInventoryByProductId(id);
     }
 
 }

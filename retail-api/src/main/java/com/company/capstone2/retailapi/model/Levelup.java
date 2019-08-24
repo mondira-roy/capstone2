@@ -1,8 +1,6 @@
 package com.company.capstone2.retailapi.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
@@ -14,9 +12,10 @@ public class Levelup {
     private int point;
     // generates "yyyy-MM-dd" output
     @JsonSerialize(using = LocalDateSerializer.class)
-    // handles "yyyy-MM-dd" input just fine (note: "yyyy-M-d" format will not work)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate memberdate; // create memberdate when create customer
+//    // handles "yyyy-MM-dd" input just fine (note:
+//    "yyyy-M-d" format will not work)
+////    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate memberDate; // create memberdate when create customer
 
     @Override
     public String toString() {
@@ -24,7 +23,7 @@ public class Levelup {
                 "levelupId=" + levelupId +
                 ", customerId=" + customerId +
                 ", point=" + point +
-                ", memberdate=" + memberdate +
+                ", memberdate=" + memberDate +
                 '}';
     }
 
@@ -36,12 +35,12 @@ public class Levelup {
         return levelupId == levelup.levelupId &&
                 customerId == levelup.customerId &&
                 point == levelup.point &&
-                memberdate.equals(levelup.memberdate);
+                memberDate.equals(levelup.memberDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(levelupId, customerId, point, memberdate);
+        return Objects.hash(levelupId, customerId, point, memberDate);
     }
 
     public int getLevelupId() {
@@ -68,11 +67,11 @@ public class Levelup {
         this.point = point;
     }
 
-    public LocalDate getMemberdate() {
-        return memberdate;
+    public LocalDate getMemberDate() {
+        return memberDate;
     }
 
-    public void setMemberdate(LocalDate memberdate) {
-        this.memberdate = memberdate;
+    public void setMemberDate(LocalDate memberDate) {
+        this.memberDate = memberDate;
     }
 }

@@ -2,6 +2,7 @@ package com.company.capstone2.inventoryservice.service;
 
 import com.company.capstone2.inventoryservice.dao.InventoryDao;
 import com.company.capstone2.inventoryservice.model.Inventory;
+import com.company.capstone2.inventoryservice.util.feign.InvoiceServiceClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,8 @@ public class InventoryServiceTest {
 
     @Mock
     InventoryDao dao;
+    @Mock
+    InvoiceServiceClient client;
 
     @InjectMocks
     InventoryService service;

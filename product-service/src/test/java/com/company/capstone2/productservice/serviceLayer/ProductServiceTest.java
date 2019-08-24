@@ -1,7 +1,11 @@
 package com.company.capstone2.productservice.serviceLayer;
 
 import com.company.capstone2.productservice.dao.ProductDao;
+import com.company.capstone2.productservice.model.Inventory;
+import com.company.capstone2.productservice.model.Invoice;
+import com.company.capstone2.productservice.model.InvoiceItem;
 import com.company.capstone2.productservice.model.Product;
+import com.company.capstone2.productservice.util.feign.InventoryServiceClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +28,12 @@ import static org.mockito.Mockito.times;
 public class ProductServiceTest {
     @InjectMocks
     ProductService service;
-
     @Mock
     ProductDao dao;
+
+    @Mock
+    InventoryServiceClient inventoryClient;
+
 
     @Before
     public void setUp() throws Exception {
@@ -34,7 +41,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void addProduct() {
+    public void testAddProduct() {
         Product product1 = new Product();
         product1.setProductName("Books");
         product1.setProductDescription("Hard Cover");
@@ -43,34 +50,36 @@ public class ProductServiceTest {
         when(dao.addProduct(product1)).thenReturn(product1);
         product1 = service.addProduct(product1);
         verify(dao, times(1)).addProduct(product1);
+
     }
 
     @Test
-    public void getAllProducts() {
+    public void testGetAllProducts() {
         List<Product> products = new ArrayList<>();
         when(dao.getAllProducts()).thenReturn(products);
         List<Product> products1 = service.getAllProducts();
-        assertEquals(products1.size(),0);
+        verify(dao, times(1)).getAllProducts();
     }
 
     @Test
-    public void getProduct() {
+    public void testGetProductById() {
         Product product1 = new Product();
-        when(dao.getProduct(1)).thenReturn(product1);
-        product1 = service.getProduct(1);
-        verify(dao, times(1)).getProduct(1);
+        when(dao.getProductById(1)).thenReturn(product1);
+        product1 = service.getProductById(1);
+        verify(dao, times(1)).getProductById(1);
     }
 
     @Test
     public void updateProduct() {
         Product product1 = new Product();
         service.updateProduct(product1);
-        verify(dao,times(1)).updateProduct(product1);
+        verify(dao, times(1)).updateProduct(product1);
     }
 
     @Test
     public void deleteProduct() {
         service.deleteProduct(1);
-        verify(dao,times(1)).deleteProduct(1);
+        verify(dao, times(1)).deleteProduct(1);
     }
+
 }

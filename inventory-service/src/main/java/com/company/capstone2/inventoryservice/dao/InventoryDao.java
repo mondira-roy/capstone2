@@ -14,4 +14,6 @@ public interface InventoryDao {
     void updateInventory(Inventory inventory);
 
     void deleteInventory(int id);
+
+    void deleteInventoryByProductId(int in);
 }

@@ -56,7 +56,7 @@ public class RetailApiController {
     }
 
     @RequestMapping(value = "/levelup/customer/{id}", method = RequestMethod.GET)
-    public int getLevelUpPointsByCustomerId(int id) {
+    public int getLevelUpPointsByCustomerId(@PathVariable int id) {
         return service.getLevelUpPointsByCustomerId(id);
     }
 

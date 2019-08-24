@@ -37,11 +37,11 @@ public class ProductDaoJdbcTemplateImplTest {
 
             product = productDao.addProduct(product);
 
-            Product product1 = productDao.getProduct(product.getProductId());
+            Product product1 = productDao.getProductById(product.getProductId());
             assertEquals(product1, product);
 
             productDao.deleteProduct(product.getProductId());
-            product1 = productDao.getProduct(product.getProductId());
+            product1 = productDao.getProductById(product.getProductId());
             //assertNull(console1);
         }
 
@@ -82,7 +82,7 @@ public class ProductDaoJdbcTemplateImplTest {
 
         productDao.updateProduct(product);
 
-        Product product1  = productDao.getProduct(product.getProductId());
+        Product product1  = productDao.getProductById(product.getProductId());
         assertEquals(product1,product);
 
     }

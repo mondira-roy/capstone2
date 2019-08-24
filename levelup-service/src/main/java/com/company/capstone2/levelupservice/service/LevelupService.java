@@ -40,7 +40,7 @@ public class LevelupService {
         dao.deleteLevelup(id);
     }
 
-    public Levelup getLevelUpByCustomerId(int id){
-       return dao.getLevelupByCustomerId(id);
+    public List<Levelup>  getLevelUpByCustomerId(int id){
+       return  dao.getLevelupByCustomerId(id);
     }
 }

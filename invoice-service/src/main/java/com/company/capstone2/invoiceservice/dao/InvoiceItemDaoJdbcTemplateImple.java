@@ -124,4 +124,12 @@ public class InvoiceItemDaoJdbcTemplateImple implements InvoiceItemDao {
                 id
         );
     }
+    @Override
+    public void deleteInvoiceItemByInventoryId(int id) {
+        String sql = "delete from invoice_item where inventory_id=?";
+        jdbcTemplate.update(
+                sql,
+                id
+        );
+    }
 }
