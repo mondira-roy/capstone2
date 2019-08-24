@@ -11,11 +11,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@RestControllerAdvice
 public class ControllerExceptionHandler {
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -65,7 +66,7 @@ public class ControllerExceptionHandler {
         return responseEntity;
     }
 
-    @ExceptionHandler(value = {NotFoundException.class})
+    @ExceptionHandler(value = {com.company.capstone2.productservice.exception.NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<VndErrors> RequestNotFoundException(NotFoundException e, WebRequest request) {
         VndErrors error = new VndErrors(request.toString(), "Not found : " + e.getMessage());

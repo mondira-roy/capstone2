@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -63,11 +64,12 @@ public class LevelupDaoJdbcTemplateImpleTest {
         levelup1.setCustomerId(1);
         levelup1.setPoint(10);
         levelup1.setMemberDate(LocalDate.of(2000,1,1));
+List<Levelup> levelups = new ArrayList<>();
+levelups.add(levelup1);
 
-        levelup1 = dao.addLevelup(levelup1);
-        Levelup levelup2 = dao.getLevelupByCustomerId(1);
-        assertEquals(levelup2,levelup1);
+       levelup1= dao.addLevelup(levelup1);
+        List<Levelup> levelup2= dao.getLevelupByCustomerId(1);
+        assertEquals(levelup2,levelups);
         levelup2 = dao.getLevelupByCustomerId(2);
-        assertNull(levelup2);
     }
 }

@@ -96,7 +96,7 @@ public class InvoiceService {
     }
 
     public void deleteInvoice(int id){
-        invoiceItemDao.deleteInvoiceItemByInvoiceId(id);
+        deleteInvoiceItemByInvoiceId(id);
         invoiceDao.deleteInvoice(id);
     }
 
@@ -108,5 +108,13 @@ public class InvoiceService {
         });
         return  ivms;
     }
-
+    public List<InvoiceItem> getInvoiceItemByInvoiceId(int id){
+        return invoiceItemDao.getInvoiceItemByInvoiceId(id);
+    }
+    public void deleteInvoiceItemByInvoiceId(int id){
+        invoiceItemDao.deleteInvoiceItemByInvoiceId(id);
+    }
+    public void deleteInvoiceItemByInventoryId(int id){
+        invoiceItemDao.deleteInvoiceItemByInventoryId(id);
+    }
 }

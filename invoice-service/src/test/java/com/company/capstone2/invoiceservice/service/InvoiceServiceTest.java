@@ -53,11 +53,13 @@ public class InvoiceServiceTest {
 
         //input to dao
         InvoiceItem invoiceItem1a = new InvoiceItem();
+        invoiceItem1a.setInvoiceId(11);
         invoiceItem1a.setInventoryId(101);
         invoiceItem1a.setQuantity(10);
         invoiceItem1a.setUnitPrice(new BigDecimal(10.00).setScale(2));
 
         InvoiceItem invoiceItem2a = new InvoiceItem();
+        invoiceItem2a.setInvoiceId(11);
         invoiceItem2a.setInventoryId(102);
         invoiceItem2a.setQuantity(1);
         invoiceItem2a.setUnitPrice(new BigDecimal(100.00).setScale(2));
@@ -108,7 +110,7 @@ public class InvoiceServiceTest {
         when(invoiceItemDao.addInvoiceItem(invoiceItem2a)).thenReturn(invoiceItem2b);
         when(invoiceDao.addInvoice(invoice1a)).thenReturn(invoice1b);
         when(invoiceDao.getInvoiceById(11)).thenReturn(invoice1b);
-
+//        invoiceItemDao.addInvoiceItem(invoiceItem)
         List<InvoiceViewModel> ivmList = new ArrayList<>();
         ivmList.add(ivm1b);
 

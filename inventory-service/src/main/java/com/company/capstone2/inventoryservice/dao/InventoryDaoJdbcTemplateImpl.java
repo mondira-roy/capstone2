@@ -23,7 +23,6 @@ public class InventoryDaoJdbcTemplateImpl implements InventoryDao {
     @Override
     public Inventory addInventory(Inventory inventory) {
         String sql = "insert into inventory (" +
-
                 "product_id," +
                 "quantity" +
                 ") values (?,?)";
@@ -87,6 +86,15 @@ public class InventoryDaoJdbcTemplateImpl implements InventoryDao {
     @Override
     public void deleteInventory(int id) {
         String sql = "delete from inventory where inventory_id=?";
+        jdbcTemplate.update(
+                sql,
+                id
+        );
+    }
+
+    @Override
+    public void deleteInventoryByProductId(int id) {
+        String sql = "delete from inventory where product_id=?";
         jdbcTemplate.update(
                 sql,
                 id

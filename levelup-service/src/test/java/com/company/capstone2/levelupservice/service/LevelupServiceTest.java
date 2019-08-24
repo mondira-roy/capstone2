@@ -69,7 +69,7 @@ public class LevelupServiceTest {
 
     @Test
     public void getLevelUpByCustomerId() {
-        Levelup levelup = service.getLevelUpByCustomerId(1);
+       List<Levelup> levelups = service.getLevelUpByCustomerId(1);
         verify(dao,times(1)).getLevelupByCustomerId(1);
     }
 }

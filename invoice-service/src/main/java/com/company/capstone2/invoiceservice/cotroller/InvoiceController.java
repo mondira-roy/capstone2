@@ -1,6 +1,7 @@
 package com.company.capstone2.invoiceservice.cotroller;
 
 import com.company.capstone2.invoiceservice.exception.NotFoundException;
+import com.company.capstone2.invoiceservice.model.InvoiceItem;
 import com.company.capstone2.invoiceservice.service.InvoiceService;
 import com.company.capstone2.invoiceservice.viewModel.InvoiceViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,32 @@ public class InvoiceController {
         }
     }
 
+    @DeleteMapping("/invoiceItem/invoice/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteInvoiceItemByInvoiceId(@PathVariable int id) {
+        service.deleteInvoiceItemByInvoiceId(id);
+    }
+
+    @DeleteMapping("/invoiceItem/inventory/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteInvoiceItemByInventoryId(@PathVariable int id) {
+        service.deleteInvoiceItemByInventoryId(id);
+    }
+
+
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteInvoice(@PathVariable int id) {
         service.deleteInvoice(id);
     }
+
+
+    @GetMapping("/invoiceitem/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    List<InvoiceItem>  getInvoiceItemByInvoiceId(@PathVariable int id){
+        return service. getInvoiceItemByInvoiceId(id);
+    }
+
 
     @GetMapping("/customer/{id}")
     @ResponseStatus(value = HttpStatus.OK)

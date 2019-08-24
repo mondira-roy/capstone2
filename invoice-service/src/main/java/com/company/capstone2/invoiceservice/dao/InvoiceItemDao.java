@@ -19,4 +19,6 @@ public interface InvoiceItemDao {
     List<InvoiceItem> getInvoiceItemByInvoiceId(int id);
 
     void deleteInvoiceItemByInvoiceId(int id);
+
+    void deleteInvoiceItemByInventoryId(int id);
 }
