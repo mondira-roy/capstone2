@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: Customer Service
+  description:  Mondira-Simon Capstone Project
+  version: 0.0.1
+servers: 
+  - url: http://localhost:7004
+    description: Customer web service
+paths: 
+  /customers:
+    post:
+      summary: Creates a new Customer entry with the given information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '201':
+          description: A Customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Invalid request syntax.
+        '422':
+          description: Incomplete LevelUp information. Some required fields missing.
+    
+    get:
+      summary: get All Customer Details
+      responses:
+        '200':
+          description: Generate a Customer list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Customer'
+                  
+  /customers/{id}:            
+    get:
+      summary: get Customer by id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Customer
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Customer list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Customer'
+   
+  
+    put:
+      summary: Updated the entry for the Customer with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Customer you would like to update.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Customer successfully updated.
+        '422':
+          description:Customer ID on path must match the ID in the Customer object.
+    
+    delete:
+      summary: Deletes the entry for the Customer with the given ID.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: ID of the Customer you would like to delete.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Customer successfully deleted.
+  
+    
+components:
+  schemas:
+  
+    Customer:
+      type: object
+      properties:
+        customerId:
+          type: number
+        firstName:
+          type: string
+        lastName:
+          type: string
+        street:
+          type: string
+        city:
+          type: string
+        zip:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+    
+          
+    

@@ -4,10 +4,13 @@ import com.company.capstone2.retailapi.exception.NotFoundException;
 import com.company.capstone2.retailapi.model.*;
 import com.company.capstone2.retailapi.util.feign.*;
 import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import feign.FeignException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.math.BigDecimal;
@@ -15,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Component
@@ -52,6 +56,8 @@ public class RetailApiService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    @HystrixCommand(fallbackMethod = "reliable3")
+    @Transactional
     public RetailInvoiceViewModel submitInvoice(RetailInvoiceViewModel ivm) {
 //        retailInvoiceViewModel (order View model)        # ${ } denote provided input
 //        private int invoiceId;                        # generated when saved
@@ -85,7 +91,7 @@ public class RetailApiService {
             try {
                 tempInventory = inventoryClient.getInventoryById(invoiceItem.getInventoryId());
             } catch (FeignException e) {
-                throw new NotFoundException("invalid invoiceItem id: " + invoiceItem.getInventoryId());
+                throw new NotFoundException("invalid inventory id: " + invoiceItem.getInventoryId());
             }
             if (tempInventory.getQuantity() < invoiceItem.getQuantity()) {
                 throw new NotFoundException("Not enough inventory");
@@ -122,7 +128,7 @@ public class RetailApiService {
         if (awardPoint == 0) {
             msg.setMemberDate(LocalDate.now());
         } else { // else pick the first date
-            List<Levelup> tempLevelups = levelupClient.getLevelUpByCustomerId(ivm.getCustomerId());
+            List<Levelup> tempLevelups = getLevelUpByCustomerId(ivm.getCustomerId());
             msg.setMemberDate(tempLevelups.get(0).getMemberDate());
         }
         msg.setPoint(ivm.getPoint());
@@ -130,6 +136,64 @@ public class RetailApiService {
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, msg);
 
         return ivm;
+    }
+
+    public RetailInvoiceViewModel reliable3(RetailInvoiceViewModel ivm) {
+        Customer customer = customerClient.getCustomerById(ivm.getCustomerId());
+        List<InvoiceItem> invoiceItems = ivm.getInvoiceItems();
+        List<Inventory> inventories = new ArrayList<>();
+        invoiceItems.stream().forEach(invoiceItem -> {
+            Inventory tempInventory = inventoryClient.getInventoryById(invoiceItem.getInventoryId());
+            inventories.add(tempInventory);
+            int productId = tempInventory.getProductId();
+            Product tempProduct = productClient.getProductById(productId);
+            invoiceItem.setUnitPrice(tempProduct.getListPrice());
+        });
+        // add invoice
+        LocalDate localDate = LocalDate.now();
+        ivm.setPurchaseDate(localDate);
+        ivm = invoiceClient.submitInvoice(ivm);
+
+        // for every 50 dollars, add 10 points
+        AtomicInteger tempPoints = new AtomicInteger(ivm.getPoint());
+        invoiceItems.stream().forEach(invoiceItem -> {
+            BigDecimal subtotal =
+                    invoiceItem.getUnitPrice().multiply(BigDecimal.valueOf(invoiceItem.getQuantity()));
+            tempPoints.addAndGet(subtotal.intValue() / 5);
+        });
+        ivm.setPoint(tempPoints.intValue());
+        // construct msg
+        Levelup msg = new Levelup();
+        msg.setMemberDate(LocalDate.now());
+        msg.setPoint(ivm.getPoint());
+        msg.setCustomerId(customer.getCustomerId());
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, msg);
+        return ivm;
+    }
+
+    @HystrixCommand(fallbackMethod = "reliable2")
+    public int getLevelUpPointsByCustomerId(int id) {
+        List<Levelup> levelups = getLevelUpByCustomerId(id);
+        int awardPoints = levelups.stream().mapToInt(Levelup::getPoint).sum();
+        return awardPoints;
+    }
+
+    @HystrixCommand(fallbackMethod = "reliable")
+    public List<Levelup> getLevelUpByCustomerId(int id) {
+        return levelupClient.getLevelUpByCustomerId(id);
+    }
+
+    public int reliable2(int id) {
+        return 0;
+    }
+
+    public List<Levelup> reliable(int id) {
+        Levelup levelup = new Levelup();
+        levelup.setCustomerId(id);
+        levelup.setPoint(0);
+        List<Levelup> levelups = new ArrayList<>();
+        levelups.add(levelup);
+        return levelups;
     }
 
 
@@ -175,17 +239,17 @@ public class RetailApiService {
 
     public List<Product> getProductsInInventory() {
 //        return productClient.getProductsInInventory();
-        List<Inventory> inventories= inventoryClient.getAllInventory();
+        List<Inventory> inventories = inventoryClient.getAllInventory();
         List<Product> products = new ArrayList<>();
         inventories.stream().forEach(inventory -> {
             int productId = inventory.getProductId();
             Product tempProduct = new Product();
-            try{
+            try {
                 tempProduct = productClient.getProductById(productId);
-            } catch (FeignException e ){
+            } catch (FeignException e) {
 
-            } finally{
-                if (tempProduct.getProductId()!=0){
+            } finally {
+                if (tempProduct.getProductId() != 0) {
                     products.add(tempProduct);
                 }
             }
@@ -195,14 +259,14 @@ public class RetailApiService {
 
     public List<Product> getProductByInvoiceId(int id) {
 //        return productClient.getProductByInvoiceId(id);
-                RetailInvoiceViewModel invoice = invoiceClient.getInvoiceById(id);
+        RetailInvoiceViewModel invoice = invoiceClient.getInvoiceById(id);
         int invoiceId = invoice.getInvoiceId();
         List<InvoiceItem> items = invoiceClient.getInvoiceItemByInvoiceId(invoiceId);
         List<Product> products = new ArrayList<>();
         items.stream().forEach(item -> {
             int tempInventoryId = item.getInventoryId();
             int tempProductId = inventoryClient.getAllInventory().stream()
-                    .filter(inventory -> inventory.getInventoryId()==tempInventoryId).collect(Collectors.toList())
+                    .filter(inventory -> inventory.getInventoryId() == tempInventoryId).collect(Collectors.toList())
                     .get(0).getProductId();
             Product tempProduct = getProductById(tempProductId);
             products.add(tempProduct);
@@ -210,11 +274,5 @@ public class RetailApiService {
         return products;
     }
 
-
-    public int getLevelUpPointsByCustomerId(int id) {
-        List<Levelup> levelups = levelupClient.getLevelUpByCustomerId(id);
-        int awardPoints = levelups.stream().mapToInt(Levelup::getPoint).sum();
-        return awardPoints;
-    }
 
 }
