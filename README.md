@@ -1,2 +1,2 @@
-# MondiraSimonU2Catpstone
+# MondiraSimonU2Capstone
 Game shop
