@@ -10,6 +10,7 @@ import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class InvoiceService {
         return ivm;
     }
 
+    @Transactional
     public InvoiceViewModel addInvoice(InvoiceViewModel ivm) {
         // build invoice from ivm
         Invoice invoice = buildInvoiceFromInvoiceViewModel(ivm);
@@ -66,6 +68,7 @@ public class InvoiceService {
         return ivm;
     }
 
+    @Transactional
     public List<InvoiceViewModel> getAllInvoices() {
         List<InvoiceViewModel> ivms = new ArrayList<>();
         List<Invoice> invoices = invoiceDao.getAllInvoices();
@@ -80,6 +83,7 @@ public class InvoiceService {
         return buildIvmFromInvoice(invoiceDao.getInvoiceById(id));
     }
 
+    @Transactional
     public void updateInvoice(InvoiceViewModel ivm){
         Invoice invoice = buildInvoiceFromInvoiceViewModel(ivm);
         // update for invoice itself
@@ -95,11 +99,13 @@ public class InvoiceService {
         });
     }
 
+    @Transactional
     public void deleteInvoice(int id){
         deleteInvoiceItemByInvoiceId(id);
         invoiceDao.deleteInvoice(id);
     }
 
+    @Transactional
     public List<InvoiceViewModel> getInvoiceByCustomerId(int id){
         List<Invoice> invoices = invoiceDao.getInvoiceByCustomerId(id);
         List<InvoiceViewModel> ivms = new ArrayList<>();

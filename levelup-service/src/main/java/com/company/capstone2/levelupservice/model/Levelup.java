@@ -5,13 +5,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class Levelup {
     private int levelupId;
+    @NotNull(message = "customer id please")
+    @Min(value = 1, message = "invalid customer id")
     private int customerId;
     private int point;
+    @NotNull(message = "member date please")
     private LocalDate memberDate; // create memberdate when create customer
 
     @Override

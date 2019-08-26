@@ -9,6 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class LevelupController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public Levelup addLevelup(@RequestBody Levelup levelup){
+    public Levelup addLevelup(@RequestBody @Valid Levelup levelup){
         return service.addLevelup(levelup);
     }
 
@@ -47,7 +48,7 @@ public class LevelupController {
     }
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void updateLevelup(@RequestBody Levelup levelup, @PathVariable int id) {
+    public void updateLevelup(@RequestBody @Valid Levelup levelup, @PathVariable int id) {
         if (levelup.getLevelupId()==id){
             service.updateLevelup(levelup);
         } else {

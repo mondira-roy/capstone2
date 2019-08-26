@@ -1,13 +1,19 @@
 package com.company.capstone2.productservice.model;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Product {
     private int productId;
+    @NotEmpty(message = "product name missing")
     private String productName;
+    @NotEmpty(message = "product name missing")
     private String productDescription;
+    @NotNull(message = "price??")
     private BigDecimal listPrice;
+    @NotNull(message = "cost??")
     private BigDecimal unitCost;
 
     public Product() {

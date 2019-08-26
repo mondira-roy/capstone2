@@ -32,6 +32,7 @@ public class LevelupService {
         return dao.getLevelupById(id);
     }
 
+    @Transactional
     public void updateLevelup(Levelup levelup) {
         dao.updateLevelup(levelup);
     }

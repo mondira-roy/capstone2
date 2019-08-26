@@ -3,22 +3,21 @@ package com.company.capstone2.retailapi.Service;
 import com.company.capstone2.retailapi.exception.NotFoundException;
 import com.company.capstone2.retailapi.model.*;
 import com.company.capstone2.retailapi.util.feign.*;
-import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
+import com.company.capstone2.retailapi.viewModel.Order;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import feign.FeignException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import java.math.BigDecimal;
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,25 +55,9 @@ public class RetailApiService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @HystrixCommand(fallbackMethod = "reliable3")
-    @Transactional
-    public RetailInvoiceViewModel submitInvoice(RetailInvoiceViewModel ivm) {
-//        retailInvoiceViewModel (order View model)        # ${ } denote provided input
-//        private int invoiceId;                        # generated when saved
-//       ${private int customerId;}                       # provided but checked first
-//        private LocalDate purchaseDate;               # LocalDate.now()
-//        private List<InvoiceItem> invoiceItems;
-        //   invoiceItem model
-        //   private int invoiceItemId;                    # generated when saved
-        //   private int invoiceId;                        # returned and set from above
-        //   ${private int inventoryId;}                      # provided but check first (if exist in inventory DB),
-        //                                                   feign with productClient for findProductById(from
-        //                                                   productId in inventory),
-        //                                                   save tempUnitPrice from the Product,set it to unitPrice
-        //   ${private int quantity;}                         # provided input
-        //   private BigDecimal unitPrice;                 # see inventoryId
-//        private int point;                            # calculated
-
+  // @HystrixCommand(fallbackMethod = "reliable3")
+   @Transactional
+    public Order submitInvoice(Order ivm) {
         // check if customer
         Customer customer;
         try {
@@ -138,7 +121,8 @@ public class RetailApiService {
         return ivm;
     }
 
-    public RetailInvoiceViewModel reliable3(RetailInvoiceViewModel ivm) {
+    @Transactional
+    public Order reliable3(Order ivm) {
         Customer customer = customerClient.getCustomerById(ivm.getCustomerId());
         List<InvoiceItem> invoiceItems = ivm.getInvoiceItems();
         List<Inventory> inventories = new ArrayList<>();
@@ -171,6 +155,7 @@ public class RetailApiService {
         return ivm;
     }
 
+    @Transactional
     @HystrixCommand(fallbackMethod = "reliable2")
     public int getLevelUpPointsByCustomerId(int id) {
         List<Levelup> levelups = getLevelUpByCustomerId(id);
@@ -178,15 +163,26 @@ public class RetailApiService {
         return awardPoints;
     }
 
+    @Transactional
     @HystrixCommand(fallbackMethod = "reliable")
     public List<Levelup> getLevelUpByCustomerId(int id) {
-        return levelupClient.getLevelUpByCustomerId(id);
+        List<Levelup> levelups= new ArrayList<>();;
+        try {
+           levelups= levelupClient.getLevelUpByCustomerId(id);
+        } catch (Exception e){
+            if (e.getCause().getClass().equals(SocketTimeoutException.class)) {
+                throw new NotFoundException("Server connection timeout!");
+            }
+        } finally {
+            return levelups;
+        }
     }
 
     public int reliable2(int id) {
-        return 0;
+        return -1;
     }
 
+    @Transactional
     public List<Levelup> reliable(int id) {
         Levelup levelup = new Levelup();
         levelup.setCustomerId(id);
@@ -197,15 +193,15 @@ public class RetailApiService {
     }
 
 
-    public RetailInvoiceViewModel getInvoiceById(int id) {
-        RetailInvoiceViewModel rivm = invoiceClient.getInvoiceById(id);
+    public Order getInvoiceById(int id) {
+        Order rivm = invoiceClient.getInvoiceById(id);
         int point = calculatePoint(rivm);
         rivm.setPoint(point);
         return rivm;
     }
 
     // helper method
-    public int calculatePoint(RetailInvoiceViewModel rivm) {
+    public int calculatePoint(Order rivm) {
         int point = rivm.getInvoiceItems().stream()
                 .map(invoiceItem -> invoiceItem.getUnitPrice().multiply(BigDecimal.valueOf(invoiceItem.getQuantity())))
                 .mapToInt(total -> total.intValue() / 5).sum();
@@ -214,8 +210,8 @@ public class RetailApiService {
     }
 
 
-    public List<RetailInvoiceViewModel> getAllInvoices() {
-        List<RetailInvoiceViewModel> rivms = invoiceClient.getAllInvoices();
+    public List<Order> getAllInvoices() {
+        List<Order> rivms = invoiceClient.getAllInvoices();
         rivms.stream().forEach(rivm -> {
             int point = calculatePoint(rivm);
             rivm.setPoint(point);
@@ -224,8 +220,8 @@ public class RetailApiService {
     }
 
 
-    public List<RetailInvoiceViewModel> getInvoicesByCustomerId(int id) {
-        List<RetailInvoiceViewModel> rivms = invoiceClient.getInvoicesByCustomerId(id);
+    public List<Order> getInvoicesByCustomerId(int id) {
+        List<Order> rivms = invoiceClient.getInvoicesByCustomerId(id);
         rivms.stream().forEach(rivm -> {
             int point = calculatePoint(rivm);
             rivm.setPoint(point);
@@ -237,6 +233,7 @@ public class RetailApiService {
         return productClient.getProductById(id);
     }
 
+
     public List<Product> getProductsInInventory() {
 //        return productClient.getProductsInInventory();
         List<Inventory> inventories = inventoryClient.getAllInventory();
@@ -247,7 +244,7 @@ public class RetailApiService {
             try {
                 tempProduct = productClient.getProductById(productId);
             } catch (FeignException e) {
-
+                throw new NotFoundException("invalid product id: " + productId);
             } finally {
                 if (tempProduct.getProductId() != 0) {
                     products.add(tempProduct);
@@ -257,9 +254,15 @@ public class RetailApiService {
         return products;
     }
 
+
     public List<Product> getProductByInvoiceId(int id) {
 //        return productClient.getProductByInvoiceId(id);
-        RetailInvoiceViewModel invoice = invoiceClient.getInvoiceById(id);
+        Order invoice = new Order();
+        try {
+            invoice = invoiceClient.getInvoiceById(id);
+        } catch (FeignException e) {
+            throw new NotFoundException("invalid invoice id: " + id);
+        }
         int invoiceId = invoice.getInvoiceId();
         List<InvoiceItem> items = invoiceClient.getInvoiceItemByInvoiceId(invoiceId);
         List<Product> products = new ArrayList<>();

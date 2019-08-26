@@ -43,6 +43,7 @@ public class ProductService {
         productDao.updateProduct(product);
     }
 
+    @Transactional
     public void deleteProduct(int id) {
         inventoryServiceClient.deleteInventoryByProductId(id);
         productDao.deleteProduct(id);

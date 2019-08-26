@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: Retail Service
+  description: MondiraSimonCapstone
+  version: 0.0.1
+servers: 
+  - url: http://localhost:8181
+    description: Retail web service
+paths: 
+  /invoices:
+    post:
+      summary: Creates a new Retail Invoice entry with the given information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Retail'
+      responses:
+        '201':
+          description: An Invoice object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Retail'
+        '400':
+          description: Invalid request syntax.
+        '422':
+          description: Incomplete Retail information. Some required fields missing.
+    
+    get:
+      summary: get All Retail Invoice Details
+      responses:
+        '200':
+          description: Generate an Invoice list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+                  
+  /invoices/{id}:            
+    get:
+      summary: get Retail Invoice by id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Invoice
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Invoice list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+        '400':
+          description: Entity not found
+  
+    
+          
+  /invoices/customer/{Id}:            
+    get:
+      summary: get Invoice by customer ID
+      parameters: 
+        - name: Id
+          in: path
+          required: true
+          description: id of the customer
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a Invoice list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+        '400':
+          description: Entity not found  
+          #--------------------------------products---------
+  /products/inventory:
+     get:
+      summary: get All Products in Inventory Details
+      parameters: 
+        - name: inventory
+          in: path
+          required: true
+          description: id of the Invoice Item
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Invoice Item list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+  /products/{id}:  
+     get:
+      summary: get All Products By Product id.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Invoice Item
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Invoice Item list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+                  
+  /products/invoice/{id}:            
+    get:
+      summary: get Product From Invoice using Product id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the Invoice Item
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate an Invoice Item list JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Retail'
+        '400':
+          description: Entity not found
+  
+  /levelUp/customer/{id}:            
+    get:
+      summary: get Level Up points From customer using customer id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: id of the customer
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Generate a level up customer object.
+          content:
+            application/json:
+              schema:
+                type: integer
+                items:
+                  $ref: '#/components/schemas/Retail'
+        '422':
+          description: Level up ID on path must match the ID in the customer object.
+        '400':
+          description: Entity not found 
+    
+components:
+  schemas:
+    Retail:
+      type: object
+      properties:
+        invoiceId:
+          type: number
+        customerId:
+          type: number
+        purchaseDate:
+          type: object # Date
+        point:
+          type: number
+        invoiceItems:
+          type: object #List of invoice Items
+        invoices:
+          type: object # List of invoice

@@ -42,6 +42,7 @@ public class AdminService {
     }
 
     //Customer CRUD
+    @Transactional
     public Customer addCustomer(Customer customer) {
         customer = customerClient.addCustomer(customer);
         return customer;
@@ -61,6 +62,7 @@ public class AdminService {
         return customer;
     }
 
+    @Transactional
     public void updateCustomer(Customer customer, int id) {
         customerClient.updateCustomer(customer, id);
     }
@@ -91,6 +93,7 @@ public class AdminService {
         return levelup;
     }
 
+    @Transactional
     public void updateLevelup(Levelup levelup, int id) {
         levelupClient.updateLevelup(levelup, id);
     }
@@ -100,7 +103,7 @@ public class AdminService {
     }
 
     //Invoice CRUD
-
+    @Transactional
     public InvoiceViewModel addInvoice(InvoiceViewModel ivm) {
         return invoiceClient.addInvoice(ivm);
     }
@@ -118,7 +121,7 @@ public class AdminService {
         }
         return ivm;
     }
-
+    @Transactional
     public void updateInvoice(InvoiceViewModel ivm, int id) {
         invoiceClient.updateInvoice(ivm, id);
     }
@@ -128,7 +131,7 @@ public class AdminService {
     }
 
     //Inventory CRUD
-
+    @Transactional
     public Inventory addInventory( Inventory inventory){
         return inventoryClient.addInventory(inventory);
     };
@@ -146,7 +149,7 @@ public class AdminService {
         }
         return inventory;
     };
-
+    @Transactional
     public void updateInventory( Inventory inventory,  int id){
         inventoryClient.updateInventory(inventory,id);
     };
@@ -156,7 +159,7 @@ public class AdminService {
     };
 
     //Product CRUD
-
+    @Transactional
     public Product addProduct( Product product){
         return productClient.addProduct(product);
     };
@@ -174,7 +177,7 @@ public class AdminService {
         }
         return product;
     };
-
+    @Transactional
     public void updateProduct(Product product, int id){
         productClient.updateProduct(product,id);
     };

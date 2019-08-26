@@ -4,14 +4,20 @@ import com.company.capstone2.inventoryservice.exception.NotFoundException;
 import com.company.capstone2.inventoryservice.model.Inventory;
 import com.company.capstone2.inventoryservice.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RefreshScope
+@CacheConfig(cacheNames = {"inventory"})
 @RequestMapping("/inventory")
 public class InventoryServiceController {
 
@@ -22,9 +28,10 @@ public class InventoryServiceController {
         this.service = service;
     }
 
+    @CachePut(key = "#result.getInventoryId()")
     @PostMapping
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public Inventory addInventory(@RequestBody Inventory inventory) {
+    public Inventory addInventory(@RequestBody @Valid Inventory inventory) {
         return service.addInventory(inventory);
     }
 
@@ -34,9 +41,10 @@ public class InventoryServiceController {
         return service.getAllInventory();
     }
 
+    @Cacheable
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public Inventory getInventoryById(@PathVariable int id)  {
+    public Inventory getInventoryById(@PathVariable  int id)  {
         Inventory inventory = service.getInventoryById(id);
         if (inventory == null) {
             throw new NotFoundException("Inventory does not exist, id: " + id);
@@ -45,9 +53,10 @@ public class InventoryServiceController {
         }
     }
 
+    @CacheEvict(key = "#inventory.getInventoryId()")
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void updateInventory(@RequestBody Inventory inventory, @PathVariable int id) throws NotFoundException {
+    public void updateInventory(@RequestBody @Valid Inventory inventory, @PathVariable int id) throws NotFoundException {
         if (inventory.getInventoryId() == id) {
             service.updateInventory(inventory);
         } else {
@@ -55,6 +64,7 @@ public class InventoryServiceController {
         }
     }
 
+    @CacheEvict
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteInventory(@PathVariable int id) {
