@@ -14,7 +14,7 @@ This set of REST APIs will support both web and mobile clients for customers. Th
 
 
 ## Outline
-![alt text](drawio/capstone2microservices)
+![alt text](drawio/capstone2microservices.png)
 
 ## Features and Functional Requirements
 
