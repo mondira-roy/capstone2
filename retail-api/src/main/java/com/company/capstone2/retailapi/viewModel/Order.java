@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-public class RetailInvoiceViewModel {
+public class Order {
     private int invoiceId;
     private int customerId;
     private LocalDate purchaseDate;
@@ -58,7 +58,7 @@ public class RetailInvoiceViewModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RetailInvoiceViewModel that = (RetailInvoiceViewModel) o;
+        Order that = (Order) o;
         return invoiceId == that.invoiceId &&
                 customerId == that.customerId &&
                 point == that.point &&

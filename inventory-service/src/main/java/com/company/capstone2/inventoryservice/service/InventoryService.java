@@ -5,6 +5,7 @@ import com.company.capstone2.inventoryservice.model.Inventory;
 import com.company.capstone2.inventoryservice.util.feign.InvoiceServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class InventoryService {
         this.invoiceClient = invoiceClient;
     }
 
+    @Transactional
     public Inventory addInventory(Inventory inventory) {
         inventory = dao.addInventory(inventory);
         return inventory;
@@ -33,10 +35,12 @@ public class InventoryService {
         return dao.getInventoryById(id);
     }
 
+    @Transactional
     public void updateInventory(Inventory inventory) {
         dao.updateInventory(inventory);
     }
 
+    @Transactional
     public void deleteInventory(int id) {
         invoiceClient.deleteInvoiceItemByInventoryId(id);
         dao.deleteInventory(id);

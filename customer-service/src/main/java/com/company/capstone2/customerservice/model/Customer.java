@@ -1,15 +1,23 @@
 package com.company.capstone2.customerservice.model;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 public class Customer {
     private int customerId;
+    @NotEmpty(message = "first name??")
     private String fistName;
+    @NotEmpty(message = "last name??")
     private String lastName;
+    @NotEmpty(message = "street name??")
     private String street;
+    @NotEmpty(message = "city name??")
     private String city;
+    @NotEmpty(message = "zip code??")
     private String zip;
+    @NotEmpty(message = "email??")
     private String email;
+    @NotEmpty(message = "phone??")
     private String phone;
 
     @Override

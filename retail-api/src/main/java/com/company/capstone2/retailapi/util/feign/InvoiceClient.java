@@ -1,9 +1,8 @@
 package com.company.capstone2.retailapi.util.feign;
 
 import com.company.capstone2.retailapi.model.InvoiceItem;
-import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
+import com.company.capstone2.retailapi.viewModel.Order;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,16 +11,16 @@ import java.util.List;
 public interface InvoiceClient {
 
     @RequestMapping(value = "/invoices", method = RequestMethod.POST)
-    public RetailInvoiceViewModel submitInvoice(@RequestBody RetailInvoiceViewModel invoice);
+    public Order submitInvoice(@RequestBody Order invoice);
 
     @RequestMapping(value = "/invoices/{id}", method = RequestMethod.GET)
-    public RetailInvoiceViewModel getInvoiceById(@PathVariable int id);
+    public Order getInvoiceById(@PathVariable int id);
 
     @RequestMapping(value = "/invoices", method = RequestMethod.GET)
-    public List<RetailInvoiceViewModel> getAllInvoices();
+    public List<Order> getAllInvoices();
 
     @RequestMapping(value = "/invoices/customer/{id}", method = RequestMethod.GET)
-    public List<RetailInvoiceViewModel> getInvoicesByCustomerId(@PathVariable int id);
+    public List<Order> getInvoicesByCustomerId(@PathVariable int id);
 
     @RequestMapping(value = "/invoices/invoiceitem/{id}", method = RequestMethod.GET)
     List<InvoiceItem>  getInvoiceItemByInvoiceId(@PathVariable int id);

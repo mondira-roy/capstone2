@@ -2,15 +2,22 @@ package com.company.capstone2.invoiceservice.viewModel;
 
 import com.company.capstone2.invoiceservice.model.InvoiceItem;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 public class InvoiceViewModel {
     private int invoiceId;
+    @Min(value = 1,message = "invalid customer id")
     private int customerId;
+    @NotNull(message = "Please supply a member date")
     private LocalDate purchaseDate;
     // an order (invoice) has many items
+    @Size(min = 1,message = "do not open an invoice with no item")
     private List<InvoiceItem> invoiceItems;
     // calculated point from the total order
     //private int point;

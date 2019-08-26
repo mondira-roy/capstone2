@@ -9,6 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,7 @@ public class InvoiceController {
     }
     @PostMapping
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public InvoiceViewModel addInvoice(@RequestBody InvoiceViewModel ivm){
+    public InvoiceViewModel addInvoice(@RequestBody @Valid InvoiceViewModel ivm){
         return service.addInvoice(ivm);
     }
 
@@ -46,7 +47,7 @@ public class InvoiceController {
     }
     @PutMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void updateInvoice(@RequestBody InvoiceViewModel ivm, @PathVariable int id) {
+    public void updateInvoice(@RequestBody @Valid InvoiceViewModel ivm, @PathVariable int id) {
         if (ivm.getInvoiceId()==id){
             service.updateInvoice(ivm);
         } else {

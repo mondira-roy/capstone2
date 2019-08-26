@@ -5,6 +5,7 @@ import com.company.capstone2.customerservice.dao.CustomerDao;
 import com.company.capstone2.customerservice.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class CustomerService {
         this.dao = dao;
     }
 
+    @Transactional
     public Customer addCustomer(Customer customer) {
         customer = dao.addCustomer(customer);
         return customer;
@@ -30,6 +32,7 @@ public class CustomerService {
         return dao.getCustomerById(id);
     }
 
+    @Transactional
     public void updateCustomer(Customer customer) {
         dao.updateCustomer(customer);
     }

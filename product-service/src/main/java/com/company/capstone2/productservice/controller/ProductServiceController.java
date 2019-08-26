@@ -5,11 +5,16 @@ import com.company.capstone2.productservice.model.Product;
 import com.company.capstone2.productservice.serviceLayer.ProductService;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +23,16 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RefreshScope
-//@CacheConfig(cacheNames = "products")
+@CacheConfig(cacheNames = {"products"})
 public class ProductServiceController {
     @Autowired
     ProductService service;
 
 
-    //@CachePut(key = "#result.getProductId()")
+    @CachePut(key = "#result.getProductId()")
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@RequestBody @Valid Product product) {
         return service.addProduct(product);
     }
 
@@ -37,7 +42,7 @@ public class ProductServiceController {
         return service.getAllProducts();
     }
 
-    //@Cacheable
+    @Cacheable
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public Product getProductById(@PathVariable int id) throws NotFoundException {
@@ -50,10 +55,10 @@ public class ProductServiceController {
         }
     }
 
-    // @CacheEvict(key = "#product.getProductId()")
+    @CacheEvict(key = "#product.getProductId()")
     @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public void updateProduct(@RequestBody Product product,@PathVariable int id)  {
+    public void updateProduct(@RequestBody @Valid Product product,@PathVariable int id)  {
         System.out.println("UPDATING Product = " + product.getProductId());
         if (id!=product.getProductId()){
             throw new com.company.capstone2.productservice.exception.NotFoundException("path id should match with id: "+id);
@@ -62,7 +67,7 @@ public class ProductServiceController {
         }
     }
 
-    //@CacheEvict
+    @CacheEvict
     @RequestMapping(value = "/products/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteProduct(@PathVariable int id) {

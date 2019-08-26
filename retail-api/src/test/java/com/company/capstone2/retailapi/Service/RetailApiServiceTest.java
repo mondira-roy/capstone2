@@ -1,9 +1,8 @@
 package com.company.capstone2.retailapi.Service;
 
-import com.company.capstone2.retailapi.exception.NotFoundException;
 import com.company.capstone2.retailapi.model.*;
 import com.company.capstone2.retailapi.util.feign.*;
-import com.company.capstone2.retailapi.viewModel.RetailInvoiceViewModel;
+import com.company.capstone2.retailapi.viewModel.Order;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.aop.aspectj.annotation.LazySingletonAspectInstanceFactoryDecorator;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -19,7 +17,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -62,7 +59,7 @@ public class RetailApiServiceTest {
         // awardPoints:40
         // }
 
-        RetailInvoiceViewModel rivm = new RetailInvoiceViewModel();
+        Order rivm = new Order();
         rivm.setCustomerId(1);
         rivm.setPurchaseDate(LocalDate.now());
         InvoiceItem invoiceItem1a = new InvoiceItem();
@@ -78,7 +75,7 @@ public class RetailApiServiceTest {
         invoiceItems.add(invoiceItem1b);
         rivm.setInvoiceItems(invoiceItems);
 
-        RetailInvoiceViewModel rivm2 = new RetailInvoiceViewModel();
+        Order rivm2 = new Order();
         rivm2.setInvoiceId(1);
         rivm2.setCustomerId(1);
         rivm2.setPurchaseDate(LocalDate.now());
@@ -130,7 +127,7 @@ public class RetailApiServiceTest {
     @Test
     public void testGetInvoiceById() {
         //arrange
-        RetailInvoiceViewModel rivm2 = new RetailInvoiceViewModel();
+        Order rivm2 = new Order();
         rivm2.setInvoiceId(1);
         rivm2.setCustomerId(1);
         rivm2.setPurchaseDate(LocalDate.now());
@@ -159,7 +156,7 @@ public class RetailApiServiceTest {
     @Test
     public void testGetAllInvoices() {
         // act
-        List<RetailInvoiceViewModel> ivms = service.getAllInvoices();
+        List<Order> ivms = service.getAllInvoices();
         // assert
         verify(invoiceClient, times(1)).getAllInvoices();
     }
@@ -168,7 +165,7 @@ public class RetailApiServiceTest {
     @Test
     public void testGetInvoiceByCustomerId() {
         // act
-        List<RetailInvoiceViewModel> ivms = service.getInvoicesByCustomerId(5);
+        List<Order> ivms = service.getInvoicesByCustomerId(5);
         // assert
         verify(invoiceClient, times(1)).getInvoicesByCustomerId(5);
     }
@@ -217,7 +214,7 @@ public class RetailApiServiceTest {
 
     @Test
     public void testGetProductByInvoiceId() {
-        RetailInvoiceViewModel invoice = new RetailInvoiceViewModel();
+        Order invoice = new Order();
         invoice.setInvoiceId(1);
 
         InvoiceItem invoiceItem1 = new InvoiceItem();
