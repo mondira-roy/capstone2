@@ -1,5 +1,5 @@
-# MondiraSimonU2Capstone
-Game shop
+# MondiraRoyCapstone
+Game shop revisited
 
 ## Objective
 This set of REST APIs will support both web and mobile clients for customers. The original design is a traditional monolithic application with a single database. This project is to move the current design and partial implementation to a design that follows the  new cloud-native architectural standards
